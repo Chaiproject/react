@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import 'antd/dist/antd.css'
 import { message } from 'antd'
 import TodoListUI from './TodoListUi'
-import { changInputAction, addItemAction, deleteItemAction , getListAction } from './store/actionCreators'
+import { changInputAction, addItemAction, deleteItemAction  , getTodoList } from './store/actionCreators'
 import store from './store/index'
-import axios from 'axios'
+// import axios from 'axios'
 
 
 class TodoList extends Component {
@@ -18,12 +18,14 @@ class TodoList extends Component {
         store.subscribe(this.storeChange)
     }
     componentDidMount() {
-        axios.get('https://www.easy-mock.com/mock/5d54d8d3d607284b9bf198a6/api/queryList',{}).then( result => {
-                const action = getListAction(result.data.data)
-                store.dispatch(action)
-        }).catch( err => {
-            console.log(err)
-        })
+        // axios.get('https://www.easy-mock.com/mock/5d54d8d3d607284b9bf198a6/api/queryList',{}).then( result => {
+        //         const action = getListAction(result.data.data)
+        //         store.dispatch(action)
+        // }).catch( err => {
+        //     console.log(err)
+        // })
+        const action = getTodoList()
+        store.dispatch(action)
     }
     changInputValue(e) {
         const action = changInputAction(e.target.value)
