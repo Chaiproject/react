@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import 'antd/dist/antd.css'
-import { Input, Button, List , message } from 'antd'
+import { message } from 'antd'
+import TodoListUI from './TodoListUi'
+import { changInputAction, addItemAction, deleteItemAction , getListAction } from './store/actionCreators'
 import store from './store/index'
+import axios from 'axios'
 
 
 class TodoList extends Component {
@@ -11,56 +14,51 @@ class TodoList extends Component {
         this.changInputValue = this.changInputValue.bind(this)
         this.storeChange = this.storeChange.bind(this)
         this.addItem = this.addItem.bind(this)
+        this.deleteItem = this.deleteItem.bind(this)
         store.subscribe(this.storeChange)
     }
-
+    componentDidMount() {
+        axios.get('https://www.easy-mock.com/mock/5d54d8d3d607284b9bf198a6/api/queryList',{}).then( result => {
+                const action = getListAction(result.data.data)
+                store.dispatch(action)
+        }).catch( err => {
+            console.log(err)
+        })
+    }
     changInputValue(e) {
-        const action = {
-            type: 'changeInput',
-            inputValue: e.target.value
-        }
+        const action = changInputAction(e.target.value)
         store.dispatch(action)
     }
+
     addItem() {
-        if(!this.state.inputValue){
+        if (!this.state.inputValue) {
             message.error('This is a normal message');
             return false;
         }
-        const action = {
-            type: 'addItem',
-        }
+        const action = addItemAction()
         store.dispatch(action)
     }
+
     deleteItem(index) {
-        const action = {
-            type: 'deleteItem',
-            index
-        }
+        const action = deleteItemAction(index)
         store.dispatch(action)
     }
+
     storeChange() {
         this.setState(store.getState())
     }
+    
     render() {
         return (
             <div>
-                {/* <Alert
-                    message="Success Tips"
-                    description="Detailed description and advice about successful copywriting."
-                    type="success"
-                    showIcon
-                /> */}
-                <Input
-                    placeholder={this.state.inputValue}
-                    style={{ width: '200px' }}
-                    value={this.state.inputValue}
-                    onChange={this.changInputValue}
-                />
-                <Button type="primary" onClick={this.addItem}>增加</Button>
-                <List bordered dataSource={this.state.list} renderItem={(item, index) => (<List.Item onClick={this.deleteItem.bind(this, index)}>{item}</List.Item>)}>
-
-                </List>
-
+                <TodoListUI
+                    inputValue={this.state.inputValue}
+                    changInputValue={this.changInputValue}
+                    addItem={this.addItem}
+                    list={this.state.list}
+                    deleteItem={this.deleteItem}
+                >
+                </TodoListUI>
             </div>
         );
     }
